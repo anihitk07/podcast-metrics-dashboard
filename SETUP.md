@@ -1,10 +1,10 @@
-# 🚀 Setup Instructions
+# 🚀 Setup & Deployment Instructions
 
-## Step-by-Step Guide to Deploy Your Podcast Metrics Dashboard
+## Quick Deploy to GitHub Pages
 
 ### Prerequisites
 ✅ Node.js 18 or higher  
-✅ npm or yarn  
+✅ npm installed  
 ✅ Git installed  
 ✅ GitHub account
 
@@ -22,13 +22,20 @@ cd podcast-metrics-dashboard
 ## 📊 Step 2: Add Your Podcast Data
 
 1. **Replace the sample CSV file** with your actual podcast metrics:
-   - Navigate to `public/data/podcast-metrics.csv`
-   - Replace it with your CSV file from the attachment you provided
-   
-2. **Ensure your CSV has these columns**:
+   ```bash
+   # Copy your CSV file to the public/data directory
+   cp /path/to/your/podcast-metrics.csv public/data/podcast-metrics.csv
+   ```
+
+2. **Ensure your CSV has these exact columns**:
    ```
    Slug, Title, Published, 1 Day, 7 Days, 14 Days, 30 Days, 90 Days, Spotify, All Time
    ```
+
+3. **CSV Format Notes**:
+   - Dates should be in `YYYY-MM-DD` format
+   - Use dashes (`–`) for missing values (they'll be parsed as 0)
+   - Numbers can include commas (e.g., `1,234`)
 
 ---
 
@@ -38,14 +45,6 @@ cd podcast-metrics-dashboard
 npm install
 ```
 
-This will install:
-- React 18.3.1
-- Vite 5.4.2
-- Recharts 2.12.0
-- PapaP arse 5.4.1
-- date-fns 3.3.1
-- Lucide React 0.344.0
-
 ---
 
 ## 🎨 Step 4: Test Locally
@@ -54,30 +53,38 @@ This will install:
 npm run dev
 ```
 
-Visit `http://localhost:5173` to see your dashboard in action!
+Visit `http://localhost:5173` to see your dashboard!
+
+**Open browser console (F12)** to see debug logs:
+- Raw CSV data sample
+- Parsed values for verification
+- Total episodes loaded
 
 ---
 
-## 🌐 Step 5: Deploy to GitHub Pages
+## 🌐 Step 5: Create GitHub Actions Workflow
 
-### Option A: Automatic Deployment (Recommended)
+Since GitHub API doesn't allow creating nested directories remotely, you need to create the workflow file locally:
 
-1. **Enable GitHub Pages**:
-   - Go to your repository on GitHub
-   - Click **Settings** → **Pages**
-   - Under "Build and deployment":
-     - Source: **GitHub Actions**
+### Create the file:
 
-2. **Create the workflow file**:
-   Create `.github/workflows/deploy.yml` with this content:
+```bash
+# Create the directories
+mkdir -p .github/workflows
+
+# Create the workflow file
+# Copy the content below into .github/workflows/deploy.yml
+```
+
+### Workflow File Content (`.github/workflows/deploy.yml`):
 
 ```yaml
-name: Deploy to GitHub Pages
+name: Deploy Podcast Dashboard to Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: ['main']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -85,197 +92,298 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
-  cancel-in-progress: false
+  group: 'pages'
+  cancel-in-progress: true
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
-
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: './dist'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
 ```
 
-3. **Commit and push**:
+---
+
+## 🚀 Step 6: Enable GitHub Pages
+
+1. Go to your repository: https://github.com/anihitk07/podcast-metrics-dashboard
+2. Click **Settings** → **Pages** (in the left sidebar)
+3. Under "Build and deployment":
+   - **Source**: Select **"GitHub Actions"**
+4. Save (if prompted)
+
+---
+
+## 📤 Step 7: Commit and Deploy
+
 ```bash
+# Add all files
 git add .
-git commit -m "Add workflow and data"
+
+# Commit your changes
+git commit -m "Add workflow and full CSV data"
+
+# Push to GitHub
 git push origin main
 ```
 
-4. **Wait for deployment**:
-   - Go to **Actions** tab in your repository
-   - Watch the deployment progress
-   - Once complete, your site will be live at:
-     `https://anihitk07.github.io/podcast-metrics-dashboard/`
+---
 
-### Option B: Manual Deployment
+## ✅ Step 8: Monitor Deployment
 
-```bash
-# Build the project
-npm run build
+1. Go to the **Actions** tab in your repository:
+   https://github.com/anihitk07/podcast-metrics-dashboard/actions
 
-# The dist folder contains your production files
-# You can deploy the dist folder to any static hosting service
-```
+2. You'll see "Deploy Podcast Dashboard to Pages" workflow running
+
+3. Wait for it to complete (usually 1-2 minutes)
+
+4. Once the green checkmark appears, your site is live at:
+   **https://anihitk07.github.io/podcast-metrics-dashboard/**
 
 ---
 
-## 🎯 Features You'll Get
+## 🎯 What You'll Get
 
-### 📊 Dashboard
-- Total episodes and downloads statistics
+### 📊 Dashboard Tab
+- Total episodes & downloads stats
 - Growth rate calculations
-- Recent performance trends with line charts
-- Top 5 performing episodes bar chart
+- Performance trends (line chart)
+- Top 5 episodes (bar chart)
 - Detailed performance table
 
-### 🔍 Episode Explorer
-- Search episodes by title or slug
-- Sort by any metric (date, downloads, etc.)
-- Filter by performance level (high/medium/low)
-- Export filtered results to CSV
+### 🔍 Episodes Tab
+- Search by title/slug
+- Sort by any metric
+- Filter by performance level
+- Export to CSV
 
-### 📈 Analytics
-- Monthly performance trends
-- Best days to publish analysis
-- Content pattern detection (numbers, questions, tech topics)
-- Performance spike/drop identification
-- Scatter plot correlation analysis
+### 📈 Analytics Tab
+- Monthly trends
+- Best publishing days
+- Content patterns
+- Performance spikes/drops
+- Correlation scatter plots
 
-### 🧠 Topic Analysis
-- Automatic topic extraction from episode titles
-- Top 20 topics by frequency visualization
-- Performance by topic analysis
-- Related episode discovery
+### 🧠 Topics Tab
+- AI-powered keyword extraction
+- Topic frequency charts
+- Performance by topic
+- Related episode finder
 
-### ⚖️ Episode Comparison
-- Compare up to 5 episodes side-by-side
-- Bar chart comparison across all metrics
-- Normalized radar chart visualization
-- Detailed comparison table
+### ⚖️ Compare Tab
+- Multi-episode comparison (up to 5)
+- Side-by-side bar charts
+- Radar chart visualization
+- Detailed metrics table
 
 ---
 
-## 🛠️ Customization
+## 🎨 Customization Guide
 
-### Change Colors
-Edit `src/index.css` to modify the color scheme:
+### Change Theme Colors
+
+Edit `src/index.css`:
+
 ```css
 :root {
-  --primary: #6366f1;  /* Main brand color */
-  --secondary: #8b5cf6; /* Secondary color */
-  --success: #10b981;   /* Success/positive color */
-  --warning: #f59e0b;   /* Warning color */
-  --danger: #ef4444;    /* Danger/negative color */
+  --primary: #6366f1;    /* Change main color */
+  --secondary: #8b5cf6;  /* Change secondary color */
+  --success: #10b981;    /* Change success color */
+  --warning: #f59e0b;    /* Change warning color */
+  --danger: #ef4444;     /* Change danger color */
 }
 ```
 
-### Adjust Chart Heights
-Modify `ResponsiveContainer` height values in component files:
+### Modify Chart Heights
+
+In any component file (e.g., `src/components/Dashboard.jsx`):
+
 ```jsx
 <ResponsiveContainer width="100%" height={400}>
+  {/* Change 400 to your preferred height */}
+</ResponsiveContainer>
 ```
 
 ### Change CSV Path
-If your CSV is in a different location, update `src/App.jsx`:
+
+If you need a different CSV location, edit `src/App.jsx`:
+
 ```jsx
-const response = await fetch('/your-path/podcast-metrics.csv')
+const response = await fetch('/your-custom-path/data.csv')
 ```
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Issue: "Failed to load data"
-**Solution**: Make sure your CSV file is in `public/data/podcast-metrics.csv`
-
-### Issue: Charts not displaying
-**Solution**: Ensure your CSV has proper date format (YYYY-MM-DD)
-
-### Issue: 404 on GitHub Pages
-**Solution**: Check that `base` in `vite.config.js` matches your repository name:
-```js
-base: '/podcast-metrics-dashboard/'
-```
-
-### Issue: Blank page after deployment
+### Problem: "Failed to load data"
 **Solution**: 
-1. Check browser console for errors
-2. Verify GitHub Pages is enabled in repository settings
-3. Make sure workflow ran successfully in Actions tab
+- Check that CSV is at `public/data/podcast-metrics.csv`
+- Verify CSV format matches expected columns
+- Check browser console for specific errors
+
+### Problem: Numbers look wrong
+**Solution**: 
+- The app now handles dashes (`–`) correctly
+- Check console logs to see raw vs parsed values
+- Ensure no extra spaces in CSV values
+
+### Problem: Charts not showing
+**Solution**: 
+- Verify dates are in `YYYY-MM-DD` format
+- Check that numeric columns contain valid numbers or dashes
+- Look for JavaScript errors in console
+
+### Problem: 404 on GitHub Pages
+**Solution**: 
+- Verify `vite.config.js` has correct base path:
+  ```js
+  base: '/podcast-metrics-dashboard/'
+  ```
+- Check that GitHub Pages is enabled in Settings
+- Ensure workflow ran successfully
+
+### Problem: Blank page after deployment
+**Solution**: 
+1. Check browser console (F12) for errors
+2. Verify Actions workflow completed successfully
+3. Wait a few minutes for DNS propagation
+4. Try hard refresh (Ctrl+Shift+R or Cmd+Shift+R)
+
+### Problem: Old data showing after update
+**Solution**:
+- Clear browser cache
+- Hard refresh (Ctrl+F5)
+- Check that new CSV is committed to repo
 
 ---
 
-## 📱 Mobile Responsiveness
+## 🔧 Advanced Configuration
 
-The dashboard is fully responsive and works on:
-- 📱 Mobile phones
-- 📱 Tablets  
-- 💻 Laptops
-- 🖥️ Desktops
+### Add More Metrics
+
+1. Update CSV with new columns
+2. Modify `src/App.jsx` parseNumber logic
+3. Add new fields to components as needed
+
+### Change Episode Count Limits
+
+In components like `Dashboard.jsx`:
+
+```jsx
+const topEpisodes = getTopPerformers(data, 'allTime', 10) // Change 10 to show more
+```
+
+### Modify Topic Extraction
+
+Edit `src/utils/analytics.js`:
+
+```javascript
+export const extractKeywords = (title, minLength = 3) => {
+  // Adjust minLength to change keyword detection
+}
+```
+
+---
+
+## 📱 Mobile Support
+
+The dashboard is fully responsive:
+- ✅ Phones (320px+)
+- ✅ Tablets (768px+)
+- ✅ Laptops (1024px+)
+- ✅ Desktops (1440px+)
+
+Test responsiveness:
+1. Open dev tools (F12)
+2. Toggle device toolbar (Ctrl+Shift+M)
+3. Test different screen sizes
 
 ---
 
 ## 🔒 Privacy & Security
 
-- All data processing happens client-side
-- No data is sent to external servers
-- CSV file is loaded from your own hosting
-- Perfect for private podcast analytics
+- ✅ **Client-side only**: All processing happens in your browser
+- ✅ **No external APIs**: No data sent to third parties
+- ✅ **Your hosting**: CSV is served from your GitHub repo
+- ✅ **Open source**: Fully auditable code
 
 ---
 
-## 🤝 Need Help?
+## 📊 Performance Tips
 
-- 📝 Open an issue on GitHub
-- 💬 Check existing issues for solutions
-- 📧 Contact the repository owner
-
----
-
-## 🎉 You're All Set!
-
-Your beautiful podcast metrics dashboard is ready to use!
-
-**Next Steps:**
-1. ✅ Test all features locally
-2. ✅ Add your real CSV data
-3. ✅ Push to GitHub
-4. ✅ Watch it deploy automatically
-5. ✅ Share your dashboard URL with your team!
+1. **Large CSV files**: The app handles 400+ episodes smoothly
+2. **Browser caching**: CSV is cached after first load
+3. **Build optimization**: Vite creates optimized production builds
+4. **Lazy loading**: Components load only when needed
 
 ---
 
-**Happy Analyzing! 📊🎙️**
+## 🆘 Getting Help
+
+1. **Check console logs**: Press F12 and look for errors
+2. **Review this guide**: Most issues are covered above
+3. **Check GitHub Actions**: Verify workflow succeeded
+4. **Open an issue**: https://github.com/anihitk07/podcast-metrics-dashboard/issues
+
+---
+
+## ✅ Deployment Checklist
+
+- [ ] Cloned repository
+- [ ] Installed dependencies (`npm install`)
+- [ ] Added full CSV data to `public/data/podcast-metrics.csv`
+- [ ] Tested locally (`npm run dev`)
+- [ ] Created `.github/workflows/deploy.yml`
+- [ ] Enabled GitHub Pages (Settings → Pages → Source: GitHub Actions)
+- [ ] Committed and pushed all changes
+- [ ] Verified Actions workflow succeeded
+- [ ] Visited live site: https://anihitk07.github.io/podcast-metrics-dashboard/
+
+---
+
+## 🎉 You're Ready!
+
+Your podcast metrics dashboard is now deployed and ready to use!
+
+**Live URL**: https://anihitk07.github.io/podcast-metrics-dashboard/
+
+**Key Features**:
+- 📊 Beautiful visualizations
+- 🔍 Powerful search & filtering
+- 📈 Advanced analytics
+- 🧠 AI topic extraction
+- ⚖️ Episode comparisons
+- 📱 Mobile responsive
+- 🚀 Auto-deploys on push
+
+**Happy Analyzing! 📊🎙️✨**
