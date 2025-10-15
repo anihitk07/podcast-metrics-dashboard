@@ -14,6 +14,32 @@ function App() {
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('dashboard')
 
+  // Helper function to parse numeric values from CSV
+  const parseNumber = (value) => {
+    // Handle null, undefined, or empty string
+    if (value === null || value === undefined || value === '') return 0
+    
+    // Handle strings (including dashes and special characters)
+    if (typeof value === 'string') {
+      // Replace en-dash, em-dash, or hyphen with empty string
+      const cleaned = value.trim().replace(/[–—-]/g, '')
+      
+      // If nothing left after removing dashes, return 0
+      if (cleaned === '' || cleaned === '–' || cleaned === '—') return 0
+      
+      // Remove commas and parse
+      const parsed = parseInt(cleaned.replace(/,/g, ''), 10)
+      return isNaN(parsed) ? 0 : parsed
+    }
+    
+    // Handle numbers
+    if (typeof value === 'number') {
+      return isNaN(value) ? 0 : Math.round(value)
+    }
+    
+    return 0
+  }
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -22,32 +48,57 @@ function App() {
         
         Papa.parse(csvText, {
           header: true,
-          dynamicTyping: true,
+          dynamicTyping: false, // Keep as strings to handle dashes properly
           skipEmptyLines: true,
+          transformHeader: (header) => {
+            // Normalize header names
+            return header.trim()
+          },
           complete: (results) => {
-            const processedData = results.data.map(row => ({
-              ...row,
-              slug: row.Slug || '',
-              title: row.Title || '',
-              published: new Date(row.Published || ''),
-              day1: parseInt(row['1 Day']) || 0,
-              day7: parseInt(row['7 Days']) || 0,
-              day14: parseInt(row['14 Days']) || 0,
-              day30: parseInt(row['30 Days']) || 0,
-              day90: parseInt(row['90 Days']) || 0,
-              spotify: parseInt(row['Spotify']) || 0,
-              allTime: parseInt(row['All Time']) || 0,
-            }))
+            console.log('Raw CSV data sample:', results.data[0]) // Debug log
             
-            setData(processedData.filter(row => row.title))
+            const processedData = results.data.map(row => {
+              const processed = {
+                slug: row.Slug || row.slug || '',
+                title: row.Title || row.title || '',
+                published: row.Published || row.published ? new Date(row.Published || row.published) : new Date(),
+                day1: parseNumber(row['1 Day']),
+                day7: parseNumber(row['7 Days']),
+                day14: parseNumber(row['14 Days']),
+                day30: parseNumber(row['30 Days']),
+                day90: parseNumber(row['90 Days']),
+                spotify: parseNumber(row['Spotify'] || row.spotify),
+                allTime: parseNumber(row['All Time'] || row.allTime),
+              }
+              
+              // Debug log for first few rows
+              if (parseInt(row.Slug) <= 482 && parseInt(row.Slug) >= 480) {
+                console.log(`Episode ${row.Slug}:`, {
+                  title: processed.title,
+                  day1Raw: row['1 Day'],
+                  day1Parsed: processed.day1,
+                  allTimeRaw: row['All Time'],
+                  allTimeParsed: processed.allTime
+                })
+              }
+              
+              return processed
+            })
+            
+            const validData = processedData.filter(row => row.title && row.title.length > 0)
+            console.log(`Loaded ${validData.length} episodes`) // Debug log
+            
+            setData(validData)
             setLoading(false)
           },
           error: (error) => {
+            console.error('CSV Parse Error:', error)
             setError('Failed to parse CSV data: ' + error.message)
             setLoading(false)
           }
         })
       } catch (err) {
+        console.error('Load Error:', err)
         setError('Failed to load data: ' + err.message)
         setLoading(false)
       }
@@ -79,6 +130,22 @@ function App() {
           <div className="error">
             <h2>Error Loading Data</h2>
             <p>{error}</p>
+            <p style={{ fontSize: '0.9em', marginTop: '1em' }}>
+              Check the browser console for more details.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="app">
+        <div className="container">
+          <div className="error">
+            <h2>No Data Found</h2>
+            <p>Please make sure your CSV file is uploaded to <code>public/data/podcast-metrics.csv</code></p>
           </div>
         </div>
       </div>
