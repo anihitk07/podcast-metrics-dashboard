@@ -2,9 +2,12 @@
 
 A beautiful, interactive dashboard for visualizing and analyzing podcast metrics. Built with React, Vite, and Recharts.
 
-![Podcast Metrics Dashboard](https://img.shields.io/badge/Status-Live-success)
+[![Live Demo](https://img.shields.io/badge/Demo-Live-success)](https://anihitk07.github.io/podcast-metrics-dashboard/)
 ![React](https://img.shields.io/badge/React-18.3.1-blue)
 ![Vite](https://img.shields.io/badge/Vite-5.4.2-purple)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**[🚀 View Live Demo](https://anihitk07.github.io/podcast-metrics-dashboard/)** | **[📖 Setup Guide](SETUP.md)** | **[📋 Next Steps](NEXT_STEPS.md)**
 
 ## ✨ Features
 
@@ -61,6 +64,8 @@ npm install
 npm run dev
 ```
 
+The application will be available at `http://localhost:5173`
+
 ### Build for Production
 
 ```bash
@@ -71,12 +76,14 @@ npm run build
 npm run preview
 ```
 
+> **Note**: For detailed deployment instructions to GitHub Pages, see the [Setup Guide](SETUP.md).
+
 ## 📦 Tech Stack
 
 - **React** - UI framework
 - **Vite** - Build tool and dev server
 - **Recharts** - Data visualization
-- **PapaP arse** - CSV parsing
+- **PapaParse** - CSV parsing
 - **date-fns** - Date manipulation
 - **Lucide React** - Icon library
 
@@ -143,6 +150,8 @@ export default defineConfig({
 })
 ```
 
+For more advanced configuration options, see the [Setup Guide](SETUP.md#advanced-configuration).
+
 ## 📊 Data Format
 
 The CSV file should have the following columns:
@@ -157,6 +166,10 @@ The CSV file should have the following columns:
 - `Spotify` - Spotify-specific downloads
 - `All Time` - Total all-time downloads
 
+Place your CSV file at `public/data/podcast-metrics.csv`. The app handles missing values (represented as dashes) and comma-separated numbers automatically.
+
+For a detailed data preparation guide, see [SETUP.md](SETUP.md#step-2-add-your-podcast-data).
+
 ## 🎯 Use Cases
 
 Perfect for:
@@ -168,11 +181,19 @@ Perfect for:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Here's how you can help:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit your changes**: `git commit -m 'Add amazing feature'`
+4. **Push to the branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
+
+Please ensure your code follows the existing style and includes appropriate documentation.
 
 ## 📝 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -180,9 +201,18 @@ This project is open source and available under the [MIT License](LICENSE).
 - Designed for ease of use and beautiful visualizations
 - Powered by modern web technologies
 
-## 📧 Contact
+## 📚 Documentation
 
-Have questions or suggestions? Open an issue or reach out!
+- **[Setup Guide](SETUP.md)** - Detailed deployment instructions
+- **[Next Steps](NEXT_STEPS.md)** - Post-setup tasks and customization
+- **[Live Demo](https://anihitk07.github.io/podcast-metrics-dashboard/)** - See it in action
+
+## 🐛 Issues & Support
+
+Found a bug or have a question?
+- **[Open an Issue](https://github.com/anihitk07/podcast-metrics-dashboard/issues)** - Report bugs or request features
+- Check the [troubleshooting section](SETUP.md#troubleshooting) in SETUP.md
+- Review existing issues before creating a new one
 
 ---
 
