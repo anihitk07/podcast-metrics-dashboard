@@ -226,6 +226,18 @@
   white-space: nowrap;
 }
 
+.table th[style*="cursor: pointer"] {
+  transition: background 0.2s;
+}
+
+.table th[style*="cursor: pointer"]:hover {
+  background: var(--bg-hover);
+}
+
+.table th[style*="cursor: pointer"]:active {
+  background: var(--bg-tertiary);
+}
+
 .table td {
   padding: 1rem;
   border-bottom: 1px solid var(--border);

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Plus, X, BarChart3 } from 'lucide-react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts'
 import { formatNumber, formatDate } from '../utils/dataProcessor'
+import { useSortableTable } from '../hooks/useSortableTable'
+import SortableTableHeader from './SortableTableHeader'
 
 export default function Comparisons({ data }) {
   const [selectedEpisodes, setSelectedEpisodes] = useState([])
@@ -77,6 +79,9 @@ export default function Comparisons({ data }) {
   ]
 
   const colors = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444']
+
+  // Add sortable table functionality
+  const { sortedData: sortedEpisodes, sortKey, sortOrder, handleSort } = useSortableTable(selectedEpisodes, 'allTime', 'desc')
 
   return (
     <div>
@@ -231,37 +236,52 @@ export default function Comparisons({ data }) {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Episode</th>
-                    <th>Published</th>
-                    <th>1 Day</th>
-                    <th>7 Days</th>
-                    <th>30 Days</th>
-                    <th>All Time</th>
+                    <SortableTableHeader sortKey="title" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                      Episode
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="published" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                      Published
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="day1" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                      1 Day
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="day7" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                      7 Days
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="day30" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                      30 Days
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="allTime" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                      All Time
+                    </SortableTableHeader>
                   </tr>
                 </thead>
                 <tbody>
-                  {selectedEpisodes.map((ep, idx) => (
-                    <tr key={ep.slug}>
-                      <td>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <div style={{ 
-                            width: '12px', 
-                            height: '12px', 
-                            background: colors[idx], 
-                            borderRadius: '50%' 
-                          }} />
-                          <span style={{ fontWeight: 500 }}>{ep.title}</span>
-                        </div>
-                      </td>
-                      <td>{formatDate(ep.published)}</td>
-                      <td>{formatNumber(ep.day1)}</td>
-                      <td>{formatNumber(ep.day7)}</td>
-                      <td>{formatNumber(ep.day30)}</td>
-                      <td style={{ fontWeight: 600, color: 'var(--success)' }}>
-                        {formatNumber(ep.allTime)}
-                      </td>
-                    </tr>
-                  ))}
+                  {sortedEpisodes.map((ep) => {
+                    const idx = selectedEpisodes.findIndex(e => e.slug === ep.slug)
+                    return (
+                      <tr key={ep.slug}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <div style={{ 
+                              width: '12px', 
+                              height: '12px', 
+                              background: colors[idx], 
+                              borderRadius: '50%' 
+                            }} />
+                            <span style={{ fontWeight: 500 }}>{ep.title}</span>
+                          </div>
+                        </td>
+                        <td>{formatDate(ep.published)}</td>
+                        <td>{formatNumber(ep.day1)}</td>
+                        <td>{formatNumber(ep.day7)}</td>
+                        <td>{formatNumber(ep.day30)}</td>
+                        <td style={{ fontWeight: 600, color: 'var(--success)' }}>
+                          {formatNumber(ep.allTime)}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

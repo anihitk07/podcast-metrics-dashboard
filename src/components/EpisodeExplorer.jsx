@@ -1,12 +1,24 @@
 import { useState } from 'react'
 import { Search, Download, Calendar } from 'lucide-react'
 import { formatNumber, formatDate } from '../utils/dataProcessor'
+import SortableTableHeader from './SortableTableHeader'
 
 export default function EpisodeExplorer({ data }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState('published')
   const [sortOrder, setSortOrder] = useState('desc')
   const [filterMetric, setFilterMetric] = useState('all')
+
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      // Toggle sort order if clicking the same column
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      // Set new sort key and default to descending
+      setSortBy(key)
+      setSortOrder('desc')
+    }
+  }
 
   const filteredData = data
     .filter(ep => {
@@ -140,13 +152,27 @@ export default function EpisodeExplorer({ data }) {
           <table className="table">
             <thead>
               <tr>
-                <th>Title</th>
-                <th><Calendar size={16} style={{ display: 'inline', marginRight: '0.25rem' }} />Published</th>
-                <th>1 Day</th>
-                <th>7 Days</th>
-                <th>14 Days</th>
-                <th>30 Days</th>
-                <th>All Time</th>
+                <SortableTableHeader sortKey="title" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort}>
+                  Title
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="published" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort}>
+                  <Calendar size={16} style={{ display: 'inline', marginRight: '0.25rem' }} />Published
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="day1" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort}>
+                  1 Day
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="day7" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort}>
+                  7 Days
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="day14" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort}>
+                  14 Days
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="day30" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort}>
+                  30 Days
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="allTime" currentSortKey={sortBy} currentSortOrder={sortOrder} onSort={handleSort}>
+                  All Time
+                </SortableTableHeader>
               </tr>
             </thead>
             <tbody>

@@ -3,6 +3,8 @@ import { Hash, TrendingUp, Search } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { analyzeTopics, findRelatedEpisodes } from '../utils/analytics'
 import { formatNumber } from '../utils/dataProcessor'
+import { useSortableTable } from '../hooks/useSortableTable'
+import SortableTableHeader from './SortableTableHeader'
 
 export default function TopicAnalysis({ data }) {
   const [searchTopic, setSearchTopic] = useState('')
@@ -21,6 +23,12 @@ export default function TopicAnalysis({ data }) {
   }))
 
   const relatedEpisodes = selectedEpisode ? findRelatedEpisodes(selectedEpisode, data, 5) : []
+
+  // Add sortable table functionality for topics
+  const { sortedData: sortedTopics, sortKey: topicSortKey, sortOrder: topicSortOrder, handleSort: handleTopicSort } = useSortableTable(filteredTopics, 'frequency', 'desc')
+  
+  // Add sortable table functionality for related episodes
+  const { sortedData: sortedRelated, sortKey: relatedSortKey, sortOrder: relatedSortOrder, handleSort: handleRelatedSort } = useSortableTable(relatedEpisodes, 'allTime', 'desc')
 
   return (
     <div>
@@ -107,21 +115,32 @@ export default function TopicAnalysis({ data }) {
           <table className="table">
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Topic</th>
-                <th>Frequency</th>
-                <th>Avg Performance</th>
-                <th>Performance Category</th>
+                <SortableTableHeader sortKey={null} currentSortKey={topicSortKey} currentSortOrder={topicSortOrder} onSort={handleTopicSort}>
+                  Rank
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="topic" currentSortKey={topicSortKey} currentSortOrder={topicSortOrder} onSort={handleTopicSort}>
+                  Topic
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="frequency" currentSortKey={topicSortKey} currentSortOrder={topicSortOrder} onSort={handleTopicSort}>
+                  Frequency
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="avgPerformance" currentSortKey={topicSortKey} currentSortOrder={topicSortOrder} onSort={handleTopicSort}>
+                  Avg Performance
+                </SortableTableHeader>
+                <SortableTableHeader sortKey={null} currentSortKey={topicSortKey} currentSortOrder={topicSortOrder} onSort={handleTopicSort}>
+                  Performance Category
+                </SortableTableHeader>
               </tr>
             </thead>
             <tbody>
-              {filteredTopics.map((topic, idx) => {
+              {sortedTopics.map((topic) => {
                 const performance = topic.avgPerformance > 5000 ? 'high' : topic.avgPerformance > 2500 ? 'medium' : 'low'
+                const originalIdx = filteredTopics.findIndex(t => t.topic === topic.topic)
                 return (
                   <tr key={topic.topic}>
                     <td>
-                      <span className={idx < 3 ? 'badge badge-warning' : 'badge'}>
-                        #{idx + 1}
+                      <span className={originalIdx < 3 ? 'badge badge-warning' : 'badge'}>
+                        #{originalIdx + 1}
                       </span>
                     </td>
                     <td style={{ fontWeight: 500 }}>{topic.topic}</td>
@@ -170,13 +189,19 @@ export default function TopicAnalysis({ data }) {
               <table className="table">
                 <thead>
                   <tr>
-                    <th>Title</th>
-                    <th>Published</th>
-                    <th>All Time Downloads</th>
+                    <SortableTableHeader sortKey="title" currentSortKey={relatedSortKey} currentSortOrder={relatedSortOrder} onSort={handleRelatedSort}>
+                      Title
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="published" currentSortKey={relatedSortKey} currentSortOrder={relatedSortOrder} onSort={handleRelatedSort}>
+                      Published
+                    </SortableTableHeader>
+                    <SortableTableHeader sortKey="allTime" currentSortKey={relatedSortKey} currentSortOrder={relatedSortOrder} onSort={handleRelatedSort}>
+                      All Time Downloads
+                    </SortableTableHeader>
                   </tr>
                 </thead>
                 <tbody>
-                  {relatedEpisodes.map(ep => (
+                  {sortedRelated.map(ep => (
                     <tr key={ep.slug}>
                       <td style={{ fontWeight: 500 }}>{ep.title}</td>
                       <td>{ep.published.toLocaleDateString()}</td>

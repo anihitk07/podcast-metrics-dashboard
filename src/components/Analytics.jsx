@@ -2,6 +2,8 @@ import { TrendingUp, Calendar, BarChart3, Target } from 'lucide-react'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ScatterChart, Scatter, ZAxis } from 'recharts'
 import { detectSeasonality, findBestPerformingTime } from '../utils/dataProcessor'
 import { analyzeContentPatterns, detectTrends } from '../utils/analytics'
+import { useSortableTable } from '../hooks/useSortableTable'
+import SortableTableHeader from './SortableTableHeader'
 
 export default function Analytics({ data }) {
   const seasonalData = detectSeasonality(data)
@@ -21,6 +23,14 @@ export default function Analytics({ data }) {
     allTime: ep.allTime,
     title: ep.title.substring(0, 40) + '...',
   }))
+
+  // Add sortable table functionality
+  const trendsWithEpisode = trends.slice(0, 10).map(trend => ({
+    ...trend,
+    title: trend.episode.title,
+    published: trend.episode.published,
+  }))
+  const { sortedData: sortedTrends, sortKey, sortOrder, handleSort } = useSortableTable(trendsWithEpisode, 'change', 'desc')
 
   return (
     <div>
@@ -159,14 +169,22 @@ export default function Analytics({ data }) {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Episode</th>
-                  <th>Published</th>
-                  <th>Type</th>
-                  <th>Change</th>
+                  <SortableTableHeader sortKey="title" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                    Episode
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="published" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                    Published
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="type" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                    Type
+                  </SortableTableHeader>
+                  <SortableTableHeader sortKey="change" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                    Change
+                  </SortableTableHeader>
                 </tr>
               </thead>
               <tbody>
-                {trends.slice(0, 10).map(trend => (
+                {sortedTrends.map(trend => (
                   <tr key={trend.episode.slug}>
                     <td style={{ fontWeight: 500 }}>{trend.episode.title}</td>
                     <td>{trend.episode.published.toLocaleDateString()}</td>
