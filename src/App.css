@@ -1,13 +1,13 @@
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, #e0f2fe 0%, #f5f3ff 35%, #fef3c7 70%, #fce7f3 100%);
 }
 
 .header {
   background: var(--bg-secondary);
   border-bottom: 1px solid var(--border);
   padding: 1.5rem 2rem;
-  box-shadow: 0 4px 6px var(--shadow);
+  box-shadow: 0 2px 8px var(--shadow);
 }
 
 .header-content {
@@ -24,6 +24,17 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.logo:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
 }
 
 .logo h1 {
@@ -77,13 +88,13 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px var(--shadow);
+  box-shadow: 0 2px 8px var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 12px var(--shadow);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .card-title {
@@ -184,7 +195,7 @@
 }
 
 .button-secondary:hover {
-  background: #475569;
+  background: var(--bg-hover);
 }
 
 .table-container {
