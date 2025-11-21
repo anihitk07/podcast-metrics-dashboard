@@ -1,6 +1,8 @@
 import { TrendingUp, TrendingDown, Users, Calendar, Award, Clock } from 'lucide-react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { formatNumber, calculateAverageMetrics, getTopPerformers, getGrowthTrend } from '../utils/dataProcessor'
+import { useSortableTable } from '../hooks/useSortableTable'
+import SortableTableHeader from './SortableTableHeader'
 
 export default function Dashboard({ data }) {
   const totalEpisodes = data.length
@@ -21,6 +23,9 @@ export default function Dashboard({ data }) {
     '30 Days': ep.day30,
     '7 Days': ep.day7,
   }))
+
+  // Add sortable table functionality
+  const { sortedData, sortKey, sortOrder, handleSort } = useSortableTable(topEpisodes, 'allTime', 'desc')
 
   return (
     <div>
@@ -114,20 +119,34 @@ export default function Dashboard({ data }) {
           <table className="table">
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Title</th>
-                <th>Published</th>
-                <th>7 Days</th>
-                <th>30 Days</th>
-                <th>All Time</th>
+                <SortableTableHeader sortKey={null} currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                  Rank
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="title" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                  Title
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="published" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                  Published
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="day7" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                  7 Days
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="day30" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                  30 Days
+                </SortableTableHeader>
+                <SortableTableHeader sortKey="allTime" currentSortKey={sortKey} currentSortOrder={sortOrder} onSort={handleSort}>
+                  All Time
+                </SortableTableHeader>
               </tr>
             </thead>
             <tbody>
-              {topEpisodes.map((ep, idx) => (
+              {sortedData.map((ep) => {
+                const rank = topEpisodes.findIndex(e => e.slug === ep.slug) + 1
+                return (
                 <tr key={ep.slug}>
                   <td>
-                    <span className={idx === 0 ? 'badge badge-warning' : 'badge'}>
-                      #{idx + 1}
+                    <span className={rank === 1 ? 'badge badge-warning' : 'badge'}>
+                      #{rank}
                     </span>
                   </td>
                   <td style={{ fontWeight: 500 }}>{ep.title}</td>
@@ -138,7 +157,7 @@ export default function Dashboard({ data }) {
                     {formatNumber(ep.allTime)}
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>

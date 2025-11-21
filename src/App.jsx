@@ -156,10 +156,14 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="header-content">
-          <div className="logo">
+          <button 
+            className="logo"
+            onClick={() => setActiveTab('dashboard')}
+            aria-label="Go to home page"
+          >
             <BarChart3 size={32} />
             <h1>Podcast Metrics</h1>
-          </div>
+          </button>
           <nav className="nav">
             {tabs.map(tab => {
               const Icon = tab.icon
